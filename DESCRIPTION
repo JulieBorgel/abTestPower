@@ -3,7 +3,7 @@ Title: A/B testing statistical power analysis
 Version: 0.0.0
 Authors@R:
     person("Julie", "Borgel", , "borgel.julie@gmail.com", role = c("aut", "cre"))
-Description: Minimal package to illustrate the difference between Frequentist and Bayesian approach to A/B testing.
+Description: Minimal R package to illustrate the difference between Frequentist and Bayesian approaches to A/B testing.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

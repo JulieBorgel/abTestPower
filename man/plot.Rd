@@ -2,25 +2,26 @@
 % Please edit documentation in R/plot.R
 \name{plot.bayesTestResults}
 \alias{plot.bayesTestResults}
+\alias{plot.powerTestResults}
 \title{plot method for bayesTestResults object}
 \usage{
-\method{plot}{bayesTestResults}(
-  bayesTestTable,
-  xAxis = .data$topScorerSampleSize,
-  yAxis = .data$lowScorerSampleSize,
-  fill = .data$probability,
-  ...
-)
+\method{plot}{bayesTestResults}(x, xAxis, yAxis, fill, ...)
+
+\method{plot}{powerTestResults}(x, xAxis, yAxis, fill, ...)
 }
 \arguments{
-\item{bayesTestTable}{output from \code{\link{runABbayesTest}}}
+\item{x}{object to plot}
 
 \item{xAxis}{unquoted column name containing the data to plot on the x axis of the tile plot}
 
 \item{yAxis}{unquoted column name containing the data to plot on the y axis of the tile plot}
 
 \item{fill}{unquoted column name containing the data to file the tile plot}
+
+\item{...}{S3 method compatibility}
 }
 \description{
 plot method for bayesTestResults object
+
+plot method for powerTestResults object
 }

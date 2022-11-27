@@ -1,7 +1,7 @@
 
 # abTestPower
 
-Minimal R package to illustrate the difference between Frequentist and Bayesian approach to A/B testing.
+Minimal R package to illustrate the difference between Frequentist and Bayesian approaches to A/B testing.
 
 ## Installation
 

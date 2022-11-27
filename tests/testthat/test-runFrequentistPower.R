@@ -38,5 +38,5 @@ test_that("abTestPowerRes works as expected", {
 
 
 test_that("plot works as expected", {
-  expect_s3_class(plot(abTestPowerResMultiple), "ggplot")
+  expect_s3_class(plot(abTestPowerResMultiple, topScorerSampleSize, lowScorerSampleSize, power), "ggplot")
 })

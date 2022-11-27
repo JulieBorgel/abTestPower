@@ -2,23 +2,26 @@
 #' @export
 #' @importFrom ggplot2 scale_fill_gradient2 geom_text geom_tile ggplot aes
 #' @importFrom dplyr pull
-#' @param bayesTestTable output from \code{\link{runABbayesTest}}
+#' @param x object to plot
 #' @param xAxis unquoted column name containing the data to plot on the x axis of the tile plot
 #' @param yAxis unquoted column name containing the data to plot on the y axis of the tile plot
 #' @param fill unquoted column name containing the data to file the tile plot
-plot.bayesTestResults <- function(bayesTestTable, xAxis = .data$topScorerSampleSize, yAxis = .data$lowScorerSampleSize, fill = .data$probability, ...) {
+#' @param ... S3 method compatibility
+#' @rdname plot
+#' @method plot bayesTestResults
+plot.bayesTestResults <- function(x, xAxis, yAxis, fill, ...) {
 
   xAxisLabels =
-  bayesTestTable |>
+  x |>
     pull({{xAxis}}) |>
     unique()
 
   yAxisLabels =
-    bayesTestTable |>
+    x |>
     pull({{yAxis}}) |>
     unique()
 
-  bayesTestTable |>
+  x |>
     mutate({{xAxis}} := factor({{xAxis}}, levels = sort(xAxisLabels)),
            {{yAxis}} := factor({{yAxis}}, levels = sort(yAxisLabels))) |>
     ggplot(aes(x = {{ xAxis }}, y = {{ yAxis }}, fill = {{ fill }})) +
@@ -34,10 +37,11 @@ plot.bayesTestResults <- function(bayesTestTable, xAxis = .data$topScorerSampleS
 
 #' plot method for powerTestResults object
 #' @export
-#' @param bayesTestTable output from \code{\link{runFrequentistPower}}
-plot.powerTestResults <- function(powerTestTable, xAxis = .data$topScorerSampleSize, yAxis = .data$lowScorerSampleSize, fill = .data$power, ...) {
+#' @rdname plot
+#' @method plot powerTestResults
+plot.powerTestResults <- function(x, xAxis, yAxis, fill, ...) {
 
-  plot.bayesTestResults(powerTestTable, {{xAxis}}, {{yAxis}}, {{fill}}) +
+  plot.bayesTestResults(x, {{xAxis}}, {{yAxis}}, {{fill}}) +
     scale_fill_gradient2(
       low = "#F2F2F2",
       high = "#cc0c48",

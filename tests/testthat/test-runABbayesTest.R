@@ -26,5 +26,5 @@ test_that("runABbayesTest works as expected", {
 
 
 test_that("plot works as expected", {
-  expect_s3_class(plot(abTestResults), "ggplot")
+  expect_s3_class(plot(abTestResults, topScorerSampleSize, lowScorerSampleSize, probability), "ggplot")
 })
