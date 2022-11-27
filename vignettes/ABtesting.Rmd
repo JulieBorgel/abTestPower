@@ -1,0 +1,102 @@
+---
+title: "Frequentist vs Bayesian A/B Testing"
+subtitle: "A/B testing applied to target prediction tool experimental validation"
+author: "Julie Borgel"
+date: "`r format(Sys.time(), '%b %d %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_depth: 4
+    toc_float: true
+    theme: flatly
+    highlight: tango
+editor_options:
+  chunk_output_type: console
+vignette: >
+  %\VignetteIndexEntry{Frequentist vs Bayesian A/B Testing}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+devtools::load_all()
+library(data.table)
+library(ggplot2)
+
+theme_set(
+ theme_minimal(
+ base_size = 14,
+ base_family = "sans") +
+ theme(strip.background = element_blank(),
+      legend.position = "bottom")
+ )
+```
+
+```{r}
+topScorerSampleSize = c(50, 75, 100, 250, 500)
+names(topScorerSampleSize) = glue("groupSize = {topScorerSampleSize}")
+lowScorerSampleSize = c(25, 50, 75, 100)
+names(lowScorerSampleSize) = glue("groupSize = {lowScorerSampleSize}")
+
+topScorerHitRate = 1/20
+lowScorerhitRate = 1/150
+```
+
+### Prior Beta distribution
+
+```{r fig.align = 'center', fig.height=12, fig.width=20, message=FALSE, warning=FALSE}
+alpha = 2
+beta = 50
+
+eps = 0.001
+x = seq(eps, 1-eps, eps)
+
+data.table(x = x,
+       y = dbeta(x,
+                 shape1 = alpha,
+                 shape2 = beta)
+       ) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_line()
+
+
+```
+
+```{r message=FALSE, warning=FALSE}
+bayesABtests <- runABbayesTest(topScorerHitRate,
+  topScorerSampleSize,
+  lowScorerhitRate,
+  lowScorerSampleSize,
+  priors = c("alpha" = alpha, "beta" = beta),
+  distribution = "bernoulli",
+  nSimulatedData = 100
+)
+```
+
+```{r fig.width = 20, fig.height = 12,  fig.align = 'center'}
+plot(bayesABtests, topScorerSampleSize, lowScorerSampleSize, probability)
+```
+
+```{r}
+
+powerTests <- runFrequentistPower(topScorerHitRate,
+  topScorerSampleSize,
+  lowScorerhitRate,
+  lowScorerSampleSize,
+  sig.level = 0.05,
+  alternative = "greater"
+)
+
+```
+
+```{r fig.width = 20, fig.height = 12,  fig.align = 'center'}
+plot(powerTests, topScorerSampleSize, lowScorerSampleSize, power)
+```
