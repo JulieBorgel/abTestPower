@@ -1,6 +1,6 @@
 ---
 title: "Frequentist vs Bayesian A/B Testing"
-subtitle: "A/B testing applied to target prediction tool experimental validation"
+subtitle: "A/B testing applied to a target prediction tool experimental validation"
 author: "Julie Borgel"
 date: "`r format(Sys.time(), '%b %d %Y')`"
 output:
@@ -19,14 +19,7 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
-```
-
-```{r setup}
+```{r setup, message=FALSE, warning=FALSE}
 devtools::load_all()
 library(data.table)
 library(ggplot2)
@@ -40,53 +33,44 @@ theme_set(
  )
 ```
 
-```{r}
-topScorerSampleSize = c(50, 75, 100, 250, 500)
-names(topScorerSampleSize) = glue("groupSize = {topScorerSampleSize}")
-lowScorerSampleSize = c(25, 50, 75, 100)
-names(lowScorerSampleSize) = glue("groupSize = {lowScorerSampleSize}")
+# Experiment context
 
-topScorerHitRate = 1/20
+We've recently developed a therapeutic target prediction tool which has been developed to identify pharmacological key proteins and prioritise therapeutic targets from a biological process represented in a directed network. The tool has been tested in-silico against a dataset of known therapeutic targets and is performing quite well. The details of the in-silico validation is outside the scope of this article but the main conclusions from this work are summarized below :
+
+* The prediction tool scores all protein nodes of a network from 0 to 100. Proteins scoring above 75 are considered potential therapeutic targets.
+* The in-silico validation shows that in average the hit rate (precision) of the top-scorer (protein score >= 75) is 1 target (success) out of 15 proteins tested (trials). 
+* Low-scorer hit rate is 1/network size and the average size of the networks in the validation dataset is 150 proteins, therefore the expected low-scoring proteins hit rate 1 target (success) out of 150 proteins tested (trials).
+
+```{r message=FALSE, warning=FALSE}
+topScorerHitRate = 1/15
 lowScorerhitRate = 1/150
 ```
 
-### Prior Beta distribution
+Although, the in-silico validation results are quite promising, we should run some experimental validation to be absolutely sure that the prediction tool is indeed identifying therapeutic targets at a better rate than what we would get by random chances. More precisely, we want to compare in an assay the top-scorer hit rate to the low-scorer hit rate. This is assuming that we already have an experimental assay set up and that we know exactly how to define a hit. The details of the experimental design is also outside the scope of this article. However, while designing the experimental validation we had to consider how to analyse the data after the assay had run. Comparing hit rates in this context would be the equivalent of running an A/B test which is widely used to compare 2 versions of a website by comparing their click-through-rate. There are two main ways of running such test: The Frequentist approach or the Bayesian approach. These are two different inferential statistical methods and there is a lot of debate over which is "The Best". In this article we are assuming the reader knows the main differences between both methods and we simply want to show how these methods can be used and the consequences it has on the experimental design.
 
-```{r fig.align = 'center', fig.height=12, fig.width=20, message=FALSE, warning=FALSE}
-alpha = 2
-beta = 50
+# Sample size
 
-eps = 0.001
-x = seq(eps, 1-eps, eps)
+As for any experimental set up we need to determine the smallest sample size that is suitable to detect the difference of hit rates and avoid Type I (false positive) and Type II (false negative) errors. The more data points we have the better but experiments are very expensive to run and we need to try to keep cost as low as possible.
 
-data.table(x = x,
-       y = dbeta(x,
-                 shape1 = alpha,
-                 shape2 = beta)
-       ) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line()
-
-
-```
-
-```{r message=FALSE, warning=FALSE}
-bayesABtests <- runABbayesTest(topScorerHitRate,
-  topScorerSampleSize,
-  lowScorerhitRate,
-  lowScorerSampleSize,
-  priors = c("alpha" = alpha, "beta" = beta),
-  distribution = "bernoulli",
-  nSimulatedData = 100
-)
-```
-
-```{r fig.width = 20, fig.height = 12,  fig.align = 'center'}
-plot(bayesABtests, topScorerSampleSize, lowScorerSampleSize, probability)
-```
+We can run the both approaches for multiple sample sizes and pick the best at the end :
 
 ```{r}
+topScorerSampleSize = c(50, 75, 100, 500)
+names(topScorerSampleSize) = glue("sampleSize = {topScorerSampleSize}")
+lowScorerSampleSize = c(25, 50, 75, 100, 500)
+names(lowScorerSampleSize) = glue("sampleSize = {lowScorerSampleSize}")
+```
 
+ * top-scorer sample size to be tested : `r topScorerSampleSize`
+ * low-scorer sample size to be tested : `r lowScorerSampleSize`
+
+We know already that we can't afford the cost of 500 data points in each sample but we are still curious to see the results with such large sample size.
+
+# The Frequentist approach : Power Analysis
+
+The `runFrequentistPower` method runs a Frequentist power analysis for 2 proportions on multiple sample sizes. It returns the results as a tidy table which can be plotted using the `plot` method.
+
+```{r}
 powerTests <- runFrequentistPower(topScorerHitRate,
   topScorerSampleSize,
   lowScorerhitRate,
@@ -97,6 +81,60 @@ powerTests <- runFrequentistPower(topScorerHitRate,
 
 ```
 
-```{r fig.width = 20, fig.height = 12,  fig.align = 'center'}
+The plot below shows the statistical power for each combination of sample size. We can easily see that only the largest sample size (500) reaches enough power (>=0.9). Therefore we can easily conclude that the experiment would most probably be too expensive if we were to use the Frequentist approach to analyse the data.
+
+```{r fig.width = 20, fig.height = 12,  fig.align = 'center', message=FALSE, warning=FALSE}
 plot(powerTests, topScorerSampleSize, lowScorerSampleSize, power)
 ```
+
+# The Bayesian approach : Simulated analysis
+
+```{r}
+alpha = 2
+beta = 33
+```
+
+# Choosing a Data Distribution & Prior
+
+In this scenario, the binomial distribution describes our binary data (hit = TRUE or hit = FALSE). The prior represent the strength of our belief before we see the data and choosing a prior is an important aspect of Bayesian experimentation methods. We’re going to use the beta distribution to model our hit rate since it's a good conjugate prior for binomial distribution. Remember that when we use beta distribution for a binary trial, the first shape represent the number of success while the second is the number of not success. Luckily for us a previous version of the prediction tool has been experimentally tested in our assay and we've found `r alpha` targets out of `r alpha + beta` proteins tested.
+
+```{r fig.align = 'center', fig.height=12, fig.width=20, message=FALSE, warning=FALSE}
+
+numSteps = 1000
+x = seq(0, 1, 1 / (numSteps - 1))
+
+data.table(x = x,
+       y = dbeta(x,
+                 shape1 = alpha,
+                 shape2 = beta)
+       ) |>
+  ggplot(aes(x = x, y = y)) +
+  geom_line() +
+  labs(x = "", y = "", title = glue("Beta probability density function for parameters : alpha = {alpha}, beta = {beta}"))
+
+```
+
+# Run A/B test on simulated data
+
+Power analysis doesn't really apply to Bayesian statistics, however, we still need to estimate the sample size in advance to be able to perform the experiment without risking to not have enough data points to detect whether the top-scorer hit rate is better than the low-scorer hit rate. Running simulations of our experiment will help us to choose a sensible required sample size for each group. The `runABbayesTest` method has been designed to run Bayesian A/B test on multiple simulated data randomly generated using the appropriate distribution based on the top-scorer and low-scorer hit rates. The method is also running for multiple sample sizes and returns the results as a tidy table which can be plotted using the `plot` method.
+
+```{r message=FALSE, warning=FALSE}
+bayesABtests <- runABbayesTest(topScorerHitRate,
+  topScorerSampleSize,
+  lowScorerhitRate,
+  lowScorerSampleSize,
+  priors = c("alpha" = alpha, "beta" = beta),
+  distribution = "bernoulliC",
+  nSimulatedData = 100
+)
+```
+
+The plot below shows the probability of top-scorer hit rate to be better than low-scorer hit rate. It is very different than the plot showing the Frequentist power analysis results. Nevertheless, it is showing that using the Bayesian approach would allow us to reduce the sample size to 100 or even 75 and still be able to detect the difference in hit rates with a probability >= 0.9.
+
+```{r fig.width = 20, fig.height = 12,  fig.align = 'center'}
+plot(bayesABtests, topScorerSampleSize, lowScorerSampleSize, probability)
+```
+
+# Conclusion
+
+We've been able to show how to use the abTestPower R package to apply Frequentist and Bayesian approach to A/B testing. We shown that the Bayesian approach will allow us to reduce the sample size. The article can be used as a guide to perform the statistical analysis for when the results from the assay are delivered.
