@@ -29,7 +29,7 @@ test_that("runABbayesTest works as expected", {
 
   expect_equal(nrow(abTestResults), length(sampleSizeA) * length(sampleSizeB))
 
-  expect_equal(unique(sapply(abTestResults$posteriorAdata, length)), nSimulatedData * n_samples)
+  expect_equal(unique(sapply(abTestResults$posteriorTopScorerData, length)), nSimulatedData * n_samples)
 
   expect_s3_class(abTestResultsClosed, "data.table")
 

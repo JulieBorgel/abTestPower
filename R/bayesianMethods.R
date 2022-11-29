@@ -9,6 +9,14 @@
 #' @param lowScorerhitRate Numeric, hit rate for the low scorer
 #' @param lowScorerSampleSize Named numeric vector, group size for the low scorer
 #' @param nSimulatedData number of trials for the simulated data
+#' @returns
+#' \describe{
+  #' \item{topScorerSampleSize}{numeric - top-scorer sample size}
+  #' \item{lowScorerSampleSize}{numeric - low-scorer sample size}
+  #' \item{probability}{numeric - Probability of top-scorer hit rate to be better than low-scorer hit rate P(topScorerHitRate > lowScorerhitRate)}
+  #' \item{posteriorTopScorerData}{list - distribution over the posterior for top-scorer (if available)}
+  #' \item{posteriorLowScorerData}{list - distribution over the posterior for low-scorer (if available)}
+  #' }
 #' @inheritParams tidyBayesTest
 #' @export
 #' @importFrom purrr map cross2 map_dfr set_names rerun map2_dfr
@@ -56,8 +64,8 @@ runABbayesTest <- function(topScorerHitRate,
     group_by(.data$topScorerSampleSize, .data$lowScorerSampleSize) |>
     summarise(
       probability = exp(mean(log(.data$probability))),
-      posteriorAdata = across(any_of("posteriorAdata"), ~list(unlist(.x, use.names = FALSE))),
-      posteriorBdata = across(any_of("posteriorBdata"), ~list(unlist(.x, use.names = FALSE))),
+      posteriorTopScorerData = across(any_of("posteriorAdata"), ~list(unlist(.x, use.names = FALSE))),
+      posteriorLowScorerData = across(any_of("posteriorBdata"), ~list(unlist(.x, use.names = FALSE))),
       .groups = "keep"
     ) |>
     data.table()

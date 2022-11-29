@@ -129,7 +129,7 @@ bayesABtests <- runABbayesTest(topScorerHitRate,
 )
 ```
 
-The plot below shows the probability of top-scorer hit rate to be better than low-scorer hit rate. It is very different than the plot showing the Frequentist power analysis results. Nevertheless, it is showing that using the Bayesian approach would allow us to reduce the sample size to 100 or even 75 and still be able to detect the difference in hit rates with a probability >= 0.9.
+The plot below shows the probability of top-scorer hit rate to be better than low-scorer hit rate. It is very different than the plot showing the Frequentist power analysis results. Nevertheless, it is showing that using the Bayesian approach would allow us to reduce the sample size as low as 75 and still be able to detect the difference in hit rates with a probability >= 0.9.
 
 ```{r fig.width = 20, fig.height = 12,  fig.align = 'center'}
 plot(bayesABtests, topScorerSampleSize, lowScorerSampleSize, probability)

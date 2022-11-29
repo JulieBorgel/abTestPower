@@ -5,6 +5,17 @@
 #' @inheritParams runABbayesTest
 #' @inheritParams tidyPwr2p2nTest
 #' @export
+#' @returns
+#' \describe{
+#' \item{effectSize}{numeric - Cohen's index Effect size \code{\link[pwr]{ES.h}} }
+#' \item{topScorerSampleSize}{numeric - top-scorer sample size}
+#' \item{lowScorerSampleSize}{numeric - low-scorer sample size}
+#' \item{pvalue}{numeric - Significance level (Type I error probability)}
+#' \item{power}{numeric - Power of test (1 minus Type II error probability)}
+#' \item{alternative}{character - alternative hypothesis}
+#' \item{note}{character - Notes}
+#' \item{alternative}{character - Method used to run the power analysis}
+#' }
 #' @importFrom pwr ES.h
 #' @importFrom dplyr any_of
 #' @seealso \code{\link[pwr]{pwr.2p2n.test}}

@@ -46,6 +46,14 @@ Not used for closed form tests.}
 }
 \value{
 Returns bayesTest results in a tidy table
+
+\describe{
+\item{topScorerSampleSize}{numeric - top-scorer sample size}
+\item{lowScorerSampleSize}{numeric - low-scorer sample size}
+\item{probability}{numeric - Probability of top-scorer hit rate to be better than low-scorer hit rate P(topScorerHitRate > lowScorerhitRate)}
+\item{posteriorTopScorerData}{list - distribution over the posterior for top-scorer (if available)}
+\item{posteriorLowScorerData}{list - distribution over the posterior for low-scorer (if available)}
+}
 }
 \description{
 Wrapper to run multiple bayesian A/B tests on lists of A_data, B_data and priors.
