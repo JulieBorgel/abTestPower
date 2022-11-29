@@ -15,6 +15,14 @@ abTestResults <- runABbayesTest(hitRateA,
                                 n_samples = n_samples
 )
 
+abTestResultsClosed <- runABbayesTest(hitRateA,
+                                sampleSizeA,
+                                hitRateB,
+                                sampleSizeB,
+                                priors = priors,
+                                distribution = "bernoulliC",
+                                nSimulatedData = nSimulatedData)
+
 test_that("runABbayesTest works as expected", {
 
   expect_s3_class(abTestResults, "data.table")
@@ -22,9 +30,15 @@ test_that("runABbayesTest works as expected", {
   expect_equal(nrow(abTestResults), length(sampleSizeA) * length(sampleSizeB))
 
   expect_equal(unique(sapply(abTestResults$posteriorAdata, length)), nSimulatedData * n_samples)
+
+  expect_s3_class(abTestResultsClosed, "data.table")
+
+  expect_equal(nrow(abTestResultsClosed), length(sampleSizeA) * length(sampleSizeB))
+
 })
 
 
 test_that("plot works as expected", {
   expect_s3_class(plot(abTestResults, topScorerSampleSize, lowScorerSampleSize, probability), "ggplot")
+  expect_s3_class(plot(abTestResultsClosed, topScorerSampleSize, lowScorerSampleSize, probability), "ggplot")
 })

@@ -39,8 +39,6 @@ runABbayesTest(
 
           See \link[bayesAB]{plotDistributions} or the \emph{Note} section of this help document for more info.}
 
-\item{distribution}{Distribution of underlying A/B test data.}
-
 \item{nSimulatedData}{number of trials for the simulated data}
 
 \item{n_samples}{Number of posterior samples to draw. Should be large enough for the distribution to converge. 1e5 is a good rule of thumb.

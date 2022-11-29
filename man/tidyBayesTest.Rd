@@ -2,18 +2,19 @@
 % Please edit documentation in R/bayesianMethods.R
 \name{tidyBayesTest}
 \alias{tidyBayesTest}
+\alias{tidyBayesTest.bernoulli}
+\alias{tidyBayesTest.bernoulliC}
 \title{bayesTest wrapper}
 \usage{
-tidyBayesTest(
-  A_data,
-  B_data,
-  priors,
-  n_samples = 1e+05,
-  distribution = c("bernoulli", "normal", "lognormal", "poisson", "exponential",
-    "uniform", "bernoulliC", "poissonC")
-)
+tidyBayesTest(...)
+
+\method{tidyBayesTest}{bernoulli}(A_data, B_data, priors, n_samples = 1e+05, ...)
+
+\method{tidyBayesTest}{bernoulliC}(A_data, B_data, priors, ...)
 }
 \arguments{
+\item{...}{S3 method compatibility}
+
 \item{A_data}{Vector of collected samples from recipe A}
 
 \item{B_data}{Vector of collected samples from recipe B}
@@ -34,8 +35,6 @@ tidyBayesTest(
 
 \item{n_samples}{Number of posterior samples to draw. Should be large enough for the distribution to converge. 1e5 is a good rule of thumb.
 Not used for closed form tests.}
-
-\item{distribution}{Distribution of underlying A/B test data.}
 }
 \description{
 Wrapper for \code{\link[bayesAB]{bayesTest}} which returns a tidy table instead of a messy list

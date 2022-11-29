@@ -28,7 +28,8 @@ runABbayesTest <- function(topScorerHitRate,
                           ),
                           nSimulatedData = 10,
                           n_samples = 1e+05) {
-  simulateData <- getS3method("randomSample", distribution)
+  simulateData <- getS3method("simulateData", distribution)
+  abTest <- getS3method("tidyBayesTest", distribution)
 
   topScorerData <- rerun(nSimulatedData, map(topScorerSampleSize, ~ {
     simulateData(.x, size = 1, prob = topScorerHitRate)
@@ -40,12 +41,11 @@ runABbayesTest <- function(topScorerHitRate,
   abTestResults <- map2_dfr(topScorerData, lowScorerData, ~ {
     cross2(.x, .y) |>
       map_dfr(~ {
-        abTestResults <- tidyBayesTest(
+        abTestResults <- abTest(
           .[[1]],
           .[[2]],
           priors = priors,
-          n_samples = n_samples,
-          distribution = distribution
+          n_samples = n_samples
         )
         return(abTestResults)
       }) |>
@@ -56,14 +56,15 @@ runABbayesTest <- function(topScorerHitRate,
     group_by(.data$topScorerSampleSize, .data$lowScorerSampleSize) |>
     summarise(
       probability = exp(mean(log(.data$probability))),
-      posteriorAdata = list(unlist(.data$posteriorAdata, use.names = FALSE)),
-      posteriorBdata = list(unlist(.data$posteriorBdata, use.names = FALSE)),
+      posteriorAdata = across(any_of("posteriorAdata"), ~list(unlist(.x, use.names = FALSE))),
+      posteriorBdata = across(any_of("posteriorBdata"), ~list(unlist(.x, use.names = FALSE))),
       .groups = "keep"
     ) |>
     data.table()
 
   setattr(abTestResults, "class", union("bayesTestResults", class(abTestResults)))
 }
+
 
 #' bayesTest wrapper
 #'
@@ -76,26 +77,46 @@ runABbayesTest <- function(topScorerHitRate,
 #'   distribution = "bernoulli"
 #' )
 #' @export
+#' @param ... S3 method compatibility
+tidyBayesTest = function(...) {
+
+  UseMethod("tidyBayesTest", ...)
+
+}
+
+#' @rdname tidyBayesTest
+#' @method tidyBayesTest bernoulli
 #' @inheritParams bayesAB::bayesTest
 #' @importFrom bayesAB bayesTest
 #' @importFrom data.table data.table
 #' @importFrom glue glue
 #' @seealso \code{\link[bayesAB]{bayesTest}}
-tidyBayesTest <- function(A_data,
+tidyBayesTest.bernoulli <- function(A_data,
                        B_data,
                        priors,
                        n_samples = 1e+05,
-                       distribution = c(
-                         "bernoulli", "normal", "lognormal", "poisson", "exponential",
-                         "uniform", "bernoulliC", "poissonC"
-                       )) {
-  abTest <- bayesTest(A_data = A_data, B_data = B_data, priors = priors, n_samples = n_samples, distribution = distribution)
+                       ...) {
+  abTest <- bayesTest(A_data = A_data, B_data = B_data, priors = priors, n_samples = n_samples, distribution = "bernoulli")
   abTestSummary <- summary(abTest)
   abTestSummaryTable <- data.table(
     probability = abTestSummary$probability$Probability,
     interval = list(abTestSummary$interval$Probability),
     posteriorAdata = list(abTest$posteriors$Probability$A),
     posteriorBdata = list(abTest$posteriors$Probability$B)
+  )
+  return(abTestSummaryTable)
+}
+
+#' @rdname tidyBayesTest
+#' @method tidyBayesTest bernoulliC
+tidyBayesTest.bernoulliC <- function(A_data,
+                                    B_data,
+                                    priors,
+                                    ...) {
+  abTest <- bayesTest(A_data = A_data, B_data = B_data, priors = priors, distribution = "bernoulliC")
+  abTestSummary <- summary(abTest)
+  abTestSummaryTable <- data.table(
+    probability = abTestSummary$probability$Probability
   )
   return(abTestSummaryTable)
 }

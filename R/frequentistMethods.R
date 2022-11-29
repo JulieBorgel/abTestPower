@@ -7,6 +7,7 @@
 #' @export
 #' @importFrom pwr ES.h
 #' @importFrom dplyr any_of
+#' @seealso \code{\link[pwr]{pwr.2p2n.test}}
 runFrequentistPower <- function(topScorerHitRate,
                              topScorerSampleSize,
                              lowScorerhitRate,

@@ -34,3 +34,6 @@ runFrequentistPower(
 \description{
 Runs Frequentist power analysis for 2 proportions on multiple sample sizes
 }
+\seealso{
+\code{\link[pwr]{pwr.2p2n.test}}
+}
