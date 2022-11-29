@@ -10,8 +10,7 @@ runABbayesTest(
   lowScorerhitRate,
   lowScorerSampleSize,
   priors,
-  distribution = c("bernoulli", "normal", "lognormal", "poisson", "exponential",
-    "uniform", "bernoulliC", "poissonC"),
+  distribution = c("bernoulli", "bernoulliC"),
   nSimulatedData = 10,
   n_samples = 1e+05
 )
@@ -38,6 +37,8 @@ runABbayesTest(
           }
 
           See \link[bayesAB]{plotDistributions} or the \emph{Note} section of this help document for more info.}
+
+\item{distribution}{of underlying A/B test data.}
 
 \item{nSimulatedData}{number of trials for the simulated data}
 

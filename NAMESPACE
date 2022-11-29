@@ -2,6 +2,8 @@
 
 S3method(plot,bayesTestResults)
 S3method(plot,powerTestResults)
+S3method(tidyBayesTest,bernoulli)
+S3method(tidyBayesTest,bernoulliC)
 export(runABbayesTest)
 export(runFrequentistPower)
 export(tidyBayesTest)

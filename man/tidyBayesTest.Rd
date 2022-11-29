@@ -42,9 +42,13 @@ Wrapper for \code{\link[bayesAB]{bayesTest}} which returns a tidy table instead 
 \examples{
 A_binom <- rbinom(100, 1, .5)
 B_binom <- rbinom(100, 1, .6)
-tidyBayesTest(A_binom, B_binom,
-  priors = c("alpha" = 1, "beta" = 1),
-  distribution = "bernoulli"
+getS3method("tidyBayesTest", "bernoulli")(A_binom, B_binom,
+  priors = c("alpha" = 1, "beta" = 1)
+)
+A_binom <- rbinom(100, 1, .5)
+B_binom <- rbinom(100, 1, .6)
+getS3method("tidyBayesTest", "bernoulliC")(A_binom, B_binom,
+  priors = c("alpha" = 1, "beta" = 1)
 )
 }
 \seealso{

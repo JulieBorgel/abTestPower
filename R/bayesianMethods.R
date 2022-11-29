@@ -9,6 +9,7 @@
 #' @param lowScorerhitRate Numeric, hit rate for the low scorer
 #' @param lowScorerSampleSize Named numeric vector, group size for the low scorer
 #' @param nSimulatedData number of trials for the simulated data
+#' @param distribution of underlying A/B test data.
 #' @returns
 #' \describe{
   #' \item{topScorerSampleSize}{numeric - top-scorer sample size}
@@ -30,10 +31,7 @@ runABbayesTest <- function(topScorerHitRate,
                           lowScorerhitRate,
                           lowScorerSampleSize,
                           priors,
-                          distribution = c(
-                            "bernoulli", "normal", "lognormal", "poisson", "exponential",
-                            "uniform", "bernoulliC", "poissonC"
-                          ),
+                          distribution = c("bernoulli", "bernoulliC"),
                           nSimulatedData = 10,
                           n_samples = 1e+05) {
   simulateData <- getS3method("simulateData", distribution)
@@ -80,9 +78,8 @@ runABbayesTest <- function(topScorerHitRate,
 #' @examples
 #' A_binom <- rbinom(100, 1, .5)
 #' B_binom <- rbinom(100, 1, .6)
-#' tidyBayesTest(A_binom, B_binom,
-#'   priors = c("alpha" = 1, "beta" = 1),
-#'   distribution = "bernoulli"
+#' getS3method("tidyBayesTest", "bernoulli")(A_binom, B_binom,
+#'   priors = c("alpha" = 1, "beta" = 1)
 #' )
 #' @export
 #' @param ... S3 method compatibility
@@ -99,6 +96,7 @@ tidyBayesTest = function(...) {
 #' @importFrom data.table data.table
 #' @importFrom glue glue
 #' @seealso \code{\link[bayesAB]{bayesTest}}
+#' @export
 tidyBayesTest.bernoulli <- function(A_data,
                        B_data,
                        priors,
@@ -117,6 +115,13 @@ tidyBayesTest.bernoulli <- function(A_data,
 
 #' @rdname tidyBayesTest
 #' @method tidyBayesTest bernoulliC
+#' @examples
+#' A_binom <- rbinom(100, 1, .5)
+#' B_binom <- rbinom(100, 1, .6)
+#' getS3method("tidyBayesTest", "bernoulliC")(A_binom, B_binom,
+#'   priors = c("alpha" = 1, "beta" = 1)
+#' )
+#' @export
 tidyBayesTest.bernoulliC <- function(A_data,
                                     B_data,
                                     priors,
