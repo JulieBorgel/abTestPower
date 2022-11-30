@@ -1,0 +1,10 @@
+pandoc: 2.19.2
+pkgdown: 2.0.6
+pkgdown_sha: ~
+articles:
+  ABtesting: ABtesting.html
+last_built: 2022-11-30T13:11Z
+urls:
+  reference: https://julieborgel.github.io/abTestPower/reference
+  article: https://julieborgel.github.io/abTestPower/articles
+
