@@ -96,7 +96,7 @@ beta = 33
 
 # Choosing a Data Distribution & Prior
 
-In this scenario, the binomial distribution describes our binary data (hit = TRUE or hit = FALSE). The prior represent the strength of our belief before we see the data and choosing a prior is an important aspect of Bayesian experimentation methods. We’re going to use the beta distribution to model our hit rate since it's a good conjugate prior for binomial distribution. Remember that when we use beta distribution for a binary trial, the first shape represent the number of success while the second is the number of not success. Luckily for us a previous version of the prediction tool has been experimentally tested in our assay and we've found `r alpha` targets out of `r alpha + beta` proteins tested.
+In this scenario, the binomial distribution describes our binary data (hit = TRUE or hit = FALSE). The prior represent the strength of our belief before we see the data and choosing a prior is an important aspect of Bayesian experimentation methods. We’re going to use the beta distribution to model our hit rate since it's a good conjugate prior for binomial distribution. Remember that when we use beta distribution for a binary trial, the first shape represent the number of success while the second is the number of failure. Luckily for us a previous version of the prediction tool has been experimentally tested in our assay and we've found `r alpha` targets out of `r alpha + beta` proteins tested.
 
 ```{r fig.align = 'center', fig.height=12, fig.width=20, message=FALSE, warning=FALSE}
 
