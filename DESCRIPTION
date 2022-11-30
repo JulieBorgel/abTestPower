@@ -25,3 +25,4 @@ Imports:
     rlang,
     tidyr
 VignetteBuilder: knitr
+URL: https://julieborgel.github.io/abTestPower/

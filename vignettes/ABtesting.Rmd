@@ -20,8 +20,9 @@ vignette: >
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
-devtools::load_all()
+library(abTestPower)
 library(data.table)
+library(glue)
 library(ggplot2)
 
 theme_set(
@@ -94,7 +95,7 @@ alpha = 2
 beta = 33
 ```
 
-# Choosing a Data Distribution & Prior
+## Choosing a Data Distribution & Prior
 
 In this scenario, the binomial distribution describes our binary data (hit = TRUE or hit = FALSE). The prior represent the strength of our belief before we see the data and choosing a prior is an important aspect of Bayesian experimentation methods. We’re going to use the beta distribution to model our hit rate since it's a good conjugate prior for binomial distribution. Remember that when we use beta distribution for a binary trial, the first shape represent the number of success while the second is the number of failure. Luckily for us a previous version of the prediction tool has been experimentally tested in our assay and we've found `r alpha` targets out of `r alpha + beta` proteins tested.
 
@@ -114,7 +115,7 @@ data.table(x = x,
 
 ```
 
-# Run A/B test on simulated data
+## Run A/B test on simulated data
 
 Power analysis doesn't really apply to Bayesian statistics, however, we still need to estimate the sample size in advance to be able to perform the experiment without risking to not have enough data points to detect whether the top-scorer hit rate is better than the low-scorer hit rate. Running simulations of our experiment will help us to choose a sensible required sample size for each group. The `runABbayesTest` method has been designed to run Bayesian A/B test on multiple simulated data randomly generated using the appropriate distribution based on the top-scorer and low-scorer hit rates. The method is also running for multiple sample sizes and returns the results as a tidy table which can be plotted using the `plot` method.
 
