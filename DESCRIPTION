@@ -23,6 +23,7 @@ Imports:
     purrr,
     pwr,
     rlang,
+    stringr,
     tidyr
 VignetteBuilder: knitr
 URL: https://julieborgel.github.io/abTestPower/

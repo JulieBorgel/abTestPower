@@ -9,7 +9,13 @@
 #' @param lowScorerhitRate Numeric, hit rate for the low scorer
 #' @param lowScorerSampleSize Named numeric vector, group size for the low scorer
 #' @param nSimulatedData number of trials for the simulated data
-#' @param distribution of underlying A/B test data.
+#' @param distribution of underlying A/B test data. See more in details
+#' @details
+#' * Only \code{bernoulli} & \code{bernoulliC} distribution are supported for now but the user can easily add a \code{tidyBayesTest} S3 method for the distribution
+#' that suits better their data. The distribution that can be implemented are the one available in the bayesAB package see \code{\link[bayesAB]{bayesTest}}.
+#' * Bernoulli can be used if the data is binary, modeled by 1s and 0s, according to a specific probability p of a 1 occurring. The conjugate Beta distribution for the parameter p should to be used.
+#' * \code{bernoulli} is using Monte Carlo sampling to estimate the posterior probability while \code{BernoulliC} is computing the posterior probability analytically (faster but doesn't report the distribution over the posterior)
+#' @md
 #' @returns
 #' \describe{
   #' \item{topScorerSampleSize}{numeric - top-scorer sample size}
@@ -83,9 +89,9 @@ runABbayesTest <- function(topScorerHitRate,
 #' )
 #' @export
 #' @param ... S3 method compatibility
-tidyBayesTest = function(...) {
+tidyBayesTest = function(A_data, ...) {
 
-  UseMethod("tidyBayesTest", ...)
+  UseMethod("tidyBayesTest", A_data)
 
 }
 
@@ -132,4 +138,27 @@ tidyBayesTest.bernoulliC <- function(A_data,
     probability = abTestSummary$probability$Probability
   )
   return(abTestSummaryTable)
+}
+
+
+#' @rdname tidyBayesTest
+#' @method tidyBayesTest default
+#' @importFrom rlang abort
+#' @importFrom stringr str_remove str_c
+#' @importFrom utils methods
+#' @export
+tidyBayesTest.default = function(A_data, ...){
+
+  availableDispatchTypes = methods('tidyBayesTest') |>
+    str_remove('tidyBayesTest.') |>
+    setdiff('default')
+
+  abort(
+    str_c(
+      'No know method to dispatch class(es): ',
+      paste0(class(A_data), collapse = '; '),
+      ' Available distribution are: ',
+      paste0( availableDispatchTypes, collapse = '; ')
+    )
+  )
 }

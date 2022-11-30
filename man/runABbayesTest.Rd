@@ -38,7 +38,7 @@ runABbayesTest(
 
           See \link[bayesAB]{plotDistributions} or the \emph{Note} section of this help document for more info.}
 
-\item{distribution}{of underlying A/B test data.}
+\item{distribution}{of underlying A/B test data. See more in details}
 
 \item{nSimulatedData}{number of trials for the simulated data}
 
@@ -58,4 +58,12 @@ Returns bayesTest results in a tidy table
 }
 \description{
 Wrapper to run multiple bayesian A/B tests on lists of A_data, B_data and priors.
+}
+\details{
+\itemize{
+\item Only \code{bernoulli} & \code{bernoulliC} distribution are supported for now but the user can easily add a \code{tidyBayesTest} S3 method for the distribution
+that suits better their data. The distribution that can be implemented are the one available in the bayesAB package see \code{\link[bayesAB]{bayesTest}}.
+\item Bernoulli can be used if the data is binary, modeled by 1s and 0s, according to a specific probability p of a 1 occurring. The conjugate Beta distribution for the parameter p should to be used.
+\item \code{bernoulli} is using Monte Carlo sampling to estimate the posterior probability while \code{BernoulliC} is computing the posterior probability analytically (faster but doesn't report the distribution over the posterior)
+}
 }
