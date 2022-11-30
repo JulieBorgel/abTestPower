@@ -4,18 +4,21 @@
 \alias{tidyBayesTest}
 \alias{tidyBayesTest.bernoulli}
 \alias{tidyBayesTest.bernoulliC}
+\alias{tidyBayesTest.default}
 \title{bayesTest wrapper}
 \usage{
-tidyBayesTest(...)
+tidyBayesTest(A_data, ...)
 
 \method{tidyBayesTest}{bernoulli}(A_data, B_data, priors, n_samples = 1e+05, ...)
 
 \method{tidyBayesTest}{bernoulliC}(A_data, B_data, priors, ...)
+
+\method{tidyBayesTest}{default}(A_data, ...)
 }
 \arguments{
-\item{...}{S3 method compatibility}
-
 \item{A_data}{Vector of collected samples from recipe A}
+
+\item{...}{S3 method compatibility}
 
 \item{B_data}{Vector of collected samples from recipe B}
 
