@@ -97,7 +97,7 @@
 
 
 <dt>distribution</dt>
-<dd><p>of underlying A/B test data.</p></dd>
+<dd><p>of underlying A/B test data. See more in details</p></dd>
 
 
 <dt>nSimulatedData</dt>
@@ -133,6 +133,14 @@ Not used for closed form tests.</p></dd>
 
 
 </dl></div>
+    <div id="details">
+    <h2>Details</h2>
+    
+<ul><li><p>Only <code>bernoulli</code> &amp; <code>bernoulliC</code> distribution are supported for now but the user can easily add a <code>tidyBayesTest</code> S3 method for the distribution
+that suits better their data. The distribution that can be implemented are the one available in the bayesAB package see <code><a href="https://rdrr.io/pkg/bayesAB/man/bayesTest.html" class="external-link">bayesTest</a></code>.</p></li>
+<li><p>Bernoulli can be used if the data is binary, modeled by 1s and 0s, according to a specific probability p of a 1 occurring. The conjugate Beta distribution for the parameter p should to be used.</p></li>
+<li><p><code>bernoulli</code> is using Monte Carlo sampling to estimate the posterior probability while <code>BernoulliC</code> is computing the posterior probability analytically (faster but doesn't report the distribution over the posterior)</p></li>
+</ul></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
