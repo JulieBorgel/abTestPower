@@ -12,7 +12,9 @@ res <- bayesTest(A_binom, B_binom, priors, distribution = "bernoulli") |>
 test_that("tidyBayesTest bernoulli works as expected", {
   expect_equal(tidyRes$probability, res$probability$Probability)
 
-  expect_equal(unlist(tidyRes$interval), res$interval$Probability)
+  expect_equal(tidyRes$credibleIntervalQ5, res$interval$Probability[[1]])
+
+  expect_equal(tidyRes$credibleIntervalQ90, res$interval$Probability[[2]])
 
   expect_equal(quantile(unlist(tidyRes$posteriorAdata)), res$posteriorSummary$Probability$A)
 

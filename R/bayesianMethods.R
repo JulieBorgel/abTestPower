@@ -66,10 +66,14 @@ runABbayesTest <- function(topScorerHitRate,
       unnest_wider(sampleSize)
   }) |>
     group_by(.data$topScorerSampleSize, .data$lowScorerSampleSize) |>
+    mutate(check = ifelse(probability > 0.9, 1, 0)) |>
     summarise(
       probability = exp(mean(log(.data$probability))),
-      posteriorTopScorerData = across(any_of("posteriorAdata"), ~list(unlist(.x, use.names = FALSE))),
-      posteriorLowScorerData = across(any_of("posteriorBdata"), ~list(unlist(.x, use.names = FALSE))),
+      power = mean(check),
+      credibleIntervalQ5 = across(any_of("credibleIntervalQ5"), ~list(.x)),
+      credibleIntervalQ90 = across(any_of("credibleIntervalQ90"), ~list(.x)),
+      posteriorTopScorerData = across(any_of("posteriorAdata"), ~list(.x)),
+      posteriorLowScorerData = across(any_of("posteriorBdata"), ~list(.x)),
       .groups = "keep"
     ) |>
     data.table()
@@ -109,14 +113,36 @@ tidyBayesTest.bernoulli <- function(A_data,
                        n_samples = 1e+05,
                        ...) {
   abTest <- bayesTest(A_data = A_data, B_data = B_data, priors = priors, n_samples = n_samples, distribution = "bernoulli")
+  class(abTest) <- union(class(abTest), "list")
+
+  tidyabTest <-
+  data.table(list(abTest)) |>
+    unnest_wider("V1") |>
+    unnest_wider(posteriors) |>
+    mutate(across(Probability, ~ map(., .f = ~ set_names(.x, c("posteriorAdata", "posteriorBdata"))))) |>
+    unnest_wider(Probability) |>
+    unnest_wider(inputs) |>
+    unnest_wider(col = c(A_data, B_data, priors)) |>
+    data.table()
+
   abTestSummary <- summary(abTest)
-  abTestSummaryTable <- data.table(
-    probability = abTestSummary$probability$Probability,
-    interval = list(abTestSummary$interval$Probability),
-    posteriorAdata = list(abTest$posteriors$Probability$A),
-    posteriorBdata = list(abTest$posteriors$Probability$B)
-  )
-  return(abTestSummaryTable)
+  class(abTestSummary) <- union(class(abTestSummary), "list")
+
+  tidyabTestSummary <-
+    data.table(list(abTestSummary)) |>
+    unnest_wider("V1") |>
+    select(-any_of("posteriorSummary")) |>
+    unnest_wider(col = c(probability)) |>
+    rename(probability = any_of("Probability")) |>
+    mutate(across(interval, ~ map(., .f = ~ set_names(.x, c("credibleInterval"))))) |>
+    unnest_wider(col = c(interval)) |>
+    mutate(across(credibleInterval, ~ map(., .f = ~ set_names(.x, c("credibleIntervalQ5", "credibleIntervalQ90"))))) |>
+    unnest_wider(col = c(credibleInterval)) |>
+    mutate(across(posteriorExpectedLoss, ~ map(., .f = ~ set_names(.x, c("posteriorExpectedLoss"))))) |>
+    unnest_wider(col = c(posteriorExpectedLoss)) |>
+    data.table()
+
+  return(bind_cols(tidyabTestSummary, tidyabTest))
 }
 
 #' @rdname tidyBayesTest

@@ -125,7 +125,7 @@ bayesABtests <- runABbayesTest(topScorerHitRate,
   lowScorerhitRate,
   lowScorerSampleSize,
   priors = c("alpha" = alpha, "beta" = beta),
-  distribution = "bernoulliC",
+  distribution = "bernoulli",
   nSimulatedData = 100
 )
 ```
@@ -135,6 +135,32 @@ The plot below shows the probability of top-scorer hit rate to be better than lo
 ```{r fig.width = 20, fig.height = 12,  fig.align = 'center'}
 plot(bayesABtests, topScorerSampleSize, lowScorerSampleSize, probability)
 ```
+
+```{r}
+bayesABtests |>
+  unnest_longer(c(credibleIntervalQ5, credibleIntervalQ90), indices_include = TRUE, indices_to = "index", names_repair =  "universal") |>
+  mutate(y = (credibleIntervalQ90 - credibleIntervalQ5)/2) |>
+ggplot(aes(x = index...5, y = y, ymin = credibleIntervalQ5, ymax = credibleIntervalQ90)) +
+  geom_hline(yintercept = c(0, .5), color = "#39778A") +
+  geom_pointrange(fatten = 1/2) +
+  facet_grid(topScorerSampleSize~lowScorerSampleSize) +
+  labs(x = "simulation index",
+       y = "Credible Interval on (A - B) / B for interval length(s) (0.9)")
+
+
+bayesABtests |>
+  unnest_longer(c(credibleIntervalQ5, credibleIntervalQ90), indices_include = TRUE, indices_to = "index", names_repair =  "universal") |>
+  group_by(topScorerSampleSize, lowScorerSampleSize, probability) |>
+  mutate(check = ifelse(probability > 0, 1, 0)) |>
+  summarise(power = mean(check))
+```
+
+
+```{r}
+devtools::install_github("quentingronau/abtest@master")
+
+```
+
 
 # Conclusion
 
