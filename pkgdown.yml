@@ -3,7 +3,7 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   ABtesting: ABtesting.html
-last_built: 2024-01-20T13:42Z
+last_built: 2024-01-20T13:43Z
 urls:
   reference: https://julieborgel.github.io/abTestPower/reference
   article: https://julieborgel.github.io/abTestPower/articles
